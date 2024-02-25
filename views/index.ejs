@@ -72,7 +72,7 @@
       </div>
       <!-- rightdiv -->
       <div id="mainrightdiv" class="w-[70%] h-full bg-[#222E35]">
-        
+
       </div>
     </div>
   </div>
@@ -121,8 +121,25 @@
 
 
 
+    //append past chats
+    async function getChatMessages() {
+      const userMessages = await axios.get('/getAllMessgaes');
+      const message = userMessages.data.messages;
+      const currUser = '<%=LoggedInUserData._id%>';
+      message.forEach((e) => {
+        if (e.sender == currUser) {
+          document.getElementById('messagesBox').innerHTML += `<h1 id="reciever" class="mt-2 ml-auto w-fit bg-[#005C4B] px-4 py-1 rounded-r-md rounded-bl-lg">${e.data}</h1>`
+        } else {
+          document.getElementById('messagesBox').innerHTML += `<h1 id="reciever" class="mt-2 mr-auto w-fit bg-[#202C33] px-4 py-1 rounded-r-md rounded-bl-lg">${e.data}</h1>`
+        }
+      })
+    }
+
+
 
     // ---------------------------------------------------------------------------------------------------------------
+
+
 
     // file upload fn
     function profileEdit() {
@@ -177,7 +194,7 @@
 
     // open Message
     function openMessageBox(username, profileImage, id) {
-      document.getElementById('mainrightdiv').innerHTML=`<div id="rightDiv" class="w-full h-full">
+      document.getElementById('mainrightdiv').innerHTML = `<div id="rightDiv" class="w-full h-full">
           <!-- rightNev -->
           <div class="w-full h-[10%] bg-[#202C33] flex items-center p-4 gap-4 text-white font-semibold text-xl">
             <div id="chatUserImage" class="h-10 w-10 rounded-full overflow-hidden">
@@ -205,10 +222,12 @@
           </div>
         </div>`
 
-
       // document.getElementById('chatUserImage').innerHTML = `<img class="w-full h-full object-cover" src=${profileImage} alt="">`;
       // document.getElementById('chatUserUsername').innerText = username;
       document.getElementById('chatUserUsername').classList.id = id
+
+      getChatMessages();
+
     }
 
 

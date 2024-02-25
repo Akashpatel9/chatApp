@@ -77,6 +77,11 @@ router.post('/addFriend', isLoggedIn, async(req,res)=>{
   res.status(200);
 })
 
+router.get('/getAllMessgaes', isLoggedIn , async(req,res)=>{
+  const data = await userModel.findOne({username:req.session.passport.user}).populate('messages');
+  res.status(200).json(data);
+})
+
 // router.post('/imageUpdate', upload.single('image'),isLoggedIn,async(req,res)=>{
 //   await userModel.findOneAndUpdate({username:req.session.passport.user},{
 //     profileImage:req.file.filename

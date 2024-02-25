@@ -1,0 +1,81 @@
+::-webkit-scrollbar{
+    width:8px ;
+    /* height: 10px; */
+    background-color: #111B21;
+}
+::-webkit-scrollbar-thumb{
+    background-color: #202C33;
+}
+
+
+
+/* login page */
+body
+{
+    margin: 0;
+    padding: 0;
+    background-color:#0C1317;
+    font-family: 'Arial';
+}
+.login{
+        width: 382px;
+        overflow: hidden;
+        margin: auto;
+        margin: 20 0 0 450px;
+        padding: 80px;
+        background: #222E35;
+        border-radius: 15px ;
+
+}
+h2{
+    text-align: center;
+    color: #222E35;
+    padding: 20px;
+}
+label{
+    color: white;
+    font-size: 17px;
+}
+#Uname{
+    width: 300px;
+    height: 30px;
+    border: none;
+    border-radius: 3px;
+    padding-left: 8px;
+}
+#Pass{
+    width: 300px;
+    height: 30px;
+    border: none;
+    border-radius: 3px;
+    padding-left: 8px;
+
+}
+#log{
+    width: 300px;
+    height: 30px;
+    border: none;
+    border-radius: 17px;
+    padding-left: 7px;
+    color: black;
+    font-weight: 700;
+    font-size: 15px;
+    cursor: pointer;
+}
+span{
+    color: white;
+    font-size: 17px;
+}
+a{
+    float: right;
+    background-color: grey;
+}
+
+.PageBtn{
+    margin-top: 50px;
+    padding: 8px 20px;
+    border-radius: 50px;
+    cursor: pointer;
+    text-decoration: none;
+    color: white;
+}

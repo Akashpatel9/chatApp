@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>socket io</title>
+  <link rel='stylesheet' href='/stylesheets/style.css' />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@4.1.0/fonts/remixicon.css" rel="stylesheet" />
+</head>
+
+<body>
+
+  <form onsubmit="imageupload()" enctype="multipart/form-data">
+    <input type="file" name="file" id="profileImage" hidden>
+  </form>
+
+  <div class="bg-[#0C1317] w-full h-screen flex items-center justify-center p-4">
+    <div class="w-full h-full flex">
+      <!-- leftdiv -->
+      <div class="w-[30%] h-full bg-[#111B21] border-r-[1px] border-r-[#313D45]">
+        <!--nev -->
+        <div class="w-full h-[10%] bg-[#202C33] flex items-center justify-between p-4">
+          <div class="flex gap-2 items-center justify-between">
+            <div class="h-10 w-10 rounded-full overflow-hidden">
+              <img class="w-full h-full object-cover" src=<%=LoggedInUserData.profileImage%> alt="">
+            </div>
+            <h1 id="userName <%=LoggedInUserData._id%>" class="text-white font-semibold">
+              <%=LoggedInUserData.username%>
+            </h1>
+          </div>
+          <div class="flex gap-5 items-center justify-center">
+            <i onclick="profileEdit()" class="ri-edit-line text-[#AEBAC1] text-xl"></i>
+            <form action="/logout" method="get">
+              <button type="submit" class="px-4 py-2 font-semibold text-white bg-[#111B21] rounded-md">SignOut</button>
+            </form>
+          </div>
+        </div>
+        <!-- search peoples -->
+        <div class="px-4 py-2 w-full h-[8%]">
+          <div class="flex items-center h-full w-full relative">
+            <i class="ri-search-line h-full w-10 bg-[#202C33] text-[#AEBAC1] flex items-center pl-2 rounded-l-xl"></i>
+            <input id="searchInput"
+              class="w-full bg-[#202C33] h-full rounded-r-xl p-2 outline-none [caret-color:white] text-white"
+              type="text" placeholder="Search or start new chat">
+            <!-- search rec -->
+            <div id="searchBox" class="absolute w-full bg-[#202C33] top-10 rounded-md overflow-auto max-h-80">
+            </div>
+          </div>
+        </div>
+        <!-- chatProfiles -->
+        <div class="w-full h-[calc(100%-8%-10%)] overflow-auto">
+          <!-- users -->
+          <div id="friendsData" class="w-full h-full ">
+            <!-- user -->
+            <%LoggedInUserData.Friends.forEach(element=> {%>
+              <div id="userBox <%=element._id%>"
+                onclick="openMessageBox('<%=element.username%>','<%=element.profileImage%>','<%=element._id%>')"
+                class="w-full h-20 px-4 flex items-center gap-3 text-white font-semibold text-xl z-50">
+                <div id="userimage" class=" pointer-events-none w-12 h-12 rounded-full overflow-hidden">
+                  <img class=" pointer-events-none w-full h-full object-cover" src=<%=element.profileImage%> alt="">
+                </div>
+                <div id="userid"
+                  class="pointer-events-none border-b-[1px] border-[#313D45] w-[calc(100%-3rem-2%)] h-full flex items-center">
+                  <h1 class="pointer-events-none">
+                    <%=element.username%>
+                  </h1>
+                </div>
+              </div>
+              <%}); %>
+          </div>
+        </div>
+      </div>
+      <!-- rightdiv -->
+      <div id="mainrightdiv" class="w-[70%] h-full bg-[#222E35]">
+        
+      </div>
+    </div>
+  </div>
+
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.7/axios.min.js"
+    integrity="sha512-NQfB/bDaB8kaSXF8E77JjhHG5PM6XVRxvHzkZiwl3ddWCEPBa23T76MuWSwAJdMGJnmQqM0VeY9kFszsrBEFrQ=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+
+    var socket = io();
+
+    // user connection
+    socket.emit('join-server', '<%=LoggedInUserData._id%>');
+
+
+    // send message fn
+    function sendMessage() {
+      const messageinput = document.querySelector('#inputChat');
+      if (messageinput.value == "") return;
+      document.getElementById('messagesBox')
+        .innerHTML += (`<h1 id="sender" class="mt-2 ml-auto w-fit bg-[#005C4B] px-4 py-1 rounded-l-md rounded-br-lg">${messageinput.value}</h1>`);
+
+      const message = {
+        'message': messageinput.value,
+        'sender': '<%=LoggedInUserData._id%>',
+        'reciever': document.getElementById('chatUserUsername').classList.id
+      }
+      socket.emit('send-private-message', message);
+      messageinput.value = "";
+    }
+
+    // // recieve message fn
+    // function recieveMessage(message) {
+    //   console.log(message);
+    //   document.getElementById('messagesBox')
+    //     .innerHTML += (`<h1 id="reciever" class="mt-2 mr-auto w-fit bg-[#202C33] px-4 py-1 rounded-r-md rounded-bl-lg">${message}</h1>`);
+    // }
+
+    // recieve message
+    socket.on('recieve-private-message', (message) => {
+      document.getElementById('messagesBox')
+        .innerHTML += (`<h1 id="reciever" class="mt-2 mr-auto w-fit bg-[#202C33] px-4 py-1 rounded-r-md rounded-bl-lg">${message.message}</h1>`);
+    })
+
+
+
+
+    // ---------------------------------------------------------------------------------------------------------------
+
+    // file upload fn
+    function profileEdit() {
+      document.querySelector('#profileImage').click();
+    }
+
+    //imageUpload
+    // async function imageupload() {
+    // const image = document.querySelector('#profileImage').value;
+    // await axios.post('/imageUpdate', {
+    //   image: image
+    // })
+    // console.log();
+    // }
+
+
+    // search Users
+    document.querySelector("#searchInput").addEventListener('input', async (e) => {
+      if (e.target.value == "") {
+        document.getElementById('searchBox').innerHTML = "";
+        return;
+      }
+      const { data } = await axios.post('/searchUser', {
+        data: e.target.value
+      })
+      let clutter = "";
+      data.forEach(element => {
+        clutter += `<div id="userBox" onclick="addFriend('${element._id}')" class=" hover:bg-green-400 w-full h-20 px-4 flex items-center gap-3 text-white font-semibold text-xl z-50 border-b-[1px] border-[#313D45] ">
+                <div id="userimage" class=" pointer-events-none w-8 h-8 rounded-full overflow-hidden">
+                  <img class=" pointer-events-none w-full h-full object-cover"
+                    src="${element.profileImage}" alt="">
+                </div>
+                <div id="userid" class="pointer-events-none w-[calc(100%-3rem-2%)] h-full flex items-center">
+                  <h1 class="pointer-events-none">${element.username}</h1>
+                </div>
+              </div>`
+        document.getElementById('searchBox').innerHTML = clutter
+      });
+    })
+
+    // add friend User
+    async function addFriend(id) {
+      document.getElementById('searchInput').value = "";
+      document.getElementById('searchBox').innerHTML = "";
+      location.reload()
+      await axios.post('/addFriend', {
+        id: id
+      })
+
+    }
+
+
+    // open Message
+    function openMessageBox(username, profileImage, id) {
+      document.getElementById('mainrightdiv').innerHTML=`<div id="rightDiv" class="w-full h-full">
+          <!-- rightNev -->
+          <div class="w-full h-[10%] bg-[#202C33] flex items-center p-4 gap-4 text-white font-semibold text-xl">
+            <div id="chatUserImage" class="h-10 w-10 rounded-full overflow-hidden">
+              <img class="w-full h-full object-cover"
+                src=${profileImage} alt="">
+            </div>
+            <h1 id="chatUserUsername">${username}</h1>
+          </div>
+          <!-- chatbox -->
+          <div
+            class="w-full h-[80%] bg-[#0B141A] overflow-y-auto text-white px-10 py-2 bg-[url('/images/itl.cat_whatsapp-wallpaper_596.png')] bg-cover">
+            <div id="messagesBox" class="w-full">
+              <!-- curruser -->
+              <!-- <h1 id="sender" class="ml-auto w-fit bg-[#005C4B] px-4 py-1 rounded-l-md rounded-br-lg">currus</h1> -->
+              <!-- otheruser -->
+              <!-- <h1 id="reciever" class="mt-2 mr-auto w-fit bg-[#202C33] px-4 py-1 rounded-r-md rounded-bl-lg">otheruser</h1> -->
+            </div>
+          </div>
+          <!-- input chat -->
+          <div class="w-full h-[10%] p-4 bg-[#202C33] flex">
+            <input id="inputChat"
+              class="w-full bg-[#2A3942] h-full rounded-md py-1 px-4 outline-none [caret-color:white] text-white"
+              type="text" placeholder="Type a message">
+            <button onclick="sendMessage()" class="px-6 py-2 bg-[#111B21] text-white font-bold rounded-md">Send</button>
+          </div>
+        </div>`
+
+
+      // document.getElementById('chatUserImage').innerHTML = `<img class="w-full h-full object-cover" src=${profileImage} alt="">`;
+      // document.getElementById('chatUserUsername').innerText = username;
+      document.getElementById('chatUserUsername').classList.id = id
+    }
+
+
+
+  </script>
+  <script src="/javascripts/script.js"></script>
+</body>
+
+</html>
